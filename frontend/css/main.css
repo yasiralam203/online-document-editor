@@ -1,0 +1,170 @@
+/* ===== Reset & Base ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f4f6f8;
+  color: #333;
+  line-height: 1.6;
+
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* ===== Header ===== */
+.site-header {
+  margin: 1%;
+  border-radius: 10px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  padding: 16px 24px;
+  background-color: #ff009d4a;
+  color: #000000;
+  position: relative;
+}
+
+.site-header a {
+  color: #000000;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.logo a {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* ===== Navigation ===== */
+.nav-tools {
+  display: flex;
+  justify-content: center; /* ⬅ CENTER MAGIC */
+}
+
+.nav-tools ul {
+  list-style: none;
+  display: flex;
+  gap: 24px;
+}
+
+.nav-tools li {
+  white-space: nowrap;
+}
+
+.nav-tools a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Auth Buttons ===== */
+.auth-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.auth-buttons .btn {
+  margin-left: 12px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  background-color: #2563eb;
+}
+
+.auth-buttons .signup {
+  background-color: #10b981;
+}
+
+/* ===== Dashboard ===== */
+.dashboard {
+  padding: 32px;
+}
+
+.dashboard h1 {
+  margin-bottom: 24px;
+}
+
+/* ===== Footer ===== */
+.site-footer {
+  margin-top: 40px;
+  padding: 16px;
+  text-align: center;
+  background-color: #1f2933;
+  color: #fff;
+}
+
+/* ===== Mobile Navbar ===== */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: #000000;
+  cursor: pointer;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .site-header {
+    grid-template-columns: auto auto;
+  }
+
+  .nav-tools {
+    position: absolute;
+    top: 64px;
+    left: 0;
+    width: 100%;
+    background-color: #1f2933;
+    display: none;
+    flex-direction: column;
+    padding: 16px 0;
+  }
+
+  .nav-tools ul {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .auth-buttons {
+    display: none; /* hide desktop auth buttons */
+  }
+
+  .menu-toggle {
+    display: block;
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 26px;
+    color: #fff;
+  }
+
+  .mobile-auth {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .nav-tools.active {
+    display: flex;
+  }
+}
+
+#header {
+  flex-shrink: 0;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+#footer {
+  flex-shrink: 0;
+}
+

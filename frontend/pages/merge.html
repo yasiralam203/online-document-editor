@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Merge PDF</title>
+
+  <!-- Global CSS -->
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/tool.css" />
+</head>
+
+<body data-root="..">
+
+  <!-- Header -->
+  <div id="header"></div>
+
+  <main class="tool-page">
+    <h1>Merge PDF Files</h1>
+    <p>Select multiple PDF files and merge them into a single document.</p>
+
+    <form class="tool-form" id="mergeForm">
+
+      <!-- Hidden file input (required for Add PDFs button) -->
+      <input
+        type="file"
+        id="pdfInput"
+        accept="application/pdf"
+        multiple
+        hidden
+      />
+      <!-- PDF Grid Area -->
+      <div class="merge-workspace">
+        <div class="pdf-grid" id="pdfGrid">
+          <!-- PDF cards -->
+        </div>
+      </div>
+
+      <!-- Action Bar -->
+      <div class="merge-actions">
+
+        <!-- Status text -->
+        <div id="mergeStatus" class="merge-status"></div>
+
+
+        <button type="button" class="tool-btn secondary" id="addPdfBtn">
+          + Add PDFs
+        </button>
+
+        <button type="submit" class="tool-btn primary" id = "mergeBtn" disabled>
+          Merge PDFs
+        </button>
+      </div>
+
+    </form>
+
+</main>
+
+  <!-- Footer -->
+  <div id="footer"></div>
+
+  <!-- Scripts -->
+  <script src="../js/include.js"></script>
+  <script src="../js/merge.js"></script>
+</body>
+</html>

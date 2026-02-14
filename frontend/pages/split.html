@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Split PDF</title>
+
+  <!-- Global CSS -->
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/tool.css" />
+</head>
+
+<body data-root="..">
+
+  <!-- Header -->
+  <div id="header"></div>
+
+  <main class="tool-page split-controller">
+    <!-- <h1>Split PDF</h1>
+    <p>Upload a PDF and extract a specific page range.</p> -->
+    <div class="pdfPreview"></div>
+    <form class="tool-form" id="splitForm">
+      <h1>Split PDF</h1>
+      <p>Upload a PDF and extract a specific page range.</p>
+      <label for="pdfFile">Choose PDF file</label>
+      <input
+        type="file"
+        id="pdfInput"
+        name="pdfFile"
+        accept="application/pdf"
+      />
+
+      <label for="startPage">Start Page</label>
+      <input
+        type="number"
+        id="startPage"
+        name="startPage"
+        min="1"
+        placeholder="e.g. 1"
+      />
+
+      <label for="endPage">End Page</label>
+      <input
+        type="number"
+        id="endPage"
+        name="endPage"
+        min="1"
+        placeholder="e.g. 5"
+      />
+
+      <button type="button" class="tool-btn primary" id="splitBtn" disabled>
+        Split PDF
+      </button>
+      <div id="splitStatus"></div>
+    </form>
+
+    <!-- Result / messages -->
+    <div class="result-area">
+      <!-- success or error message will appear here later -->
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <div id="footer"></div>
+
+  <!-- Scripts -->
+  <script src="../js/include.js"></script>
+  <script src="../js/split.js"></script>
+</body>
+</html>

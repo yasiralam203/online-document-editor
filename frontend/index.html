@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF Tools Dashboard</title>
+
+  <!-- Global CSS -->
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/tool.css" />
+</head>
+
+<body data-root="">
+
+  <!-- Header will be injected here -->
+  <div id="header"></div>
+
+  <main class="dashboard">
+    <h1>All PDF Tools</h1>
+
+    <div class="tools-grid">
+
+      <div class="tool-card">
+        <h2>Merge PDF</h2>
+        <p>Combine multiple PDF files into one.</p>
+        <a href="pages/merge.html" class="tool-btn">Open</a>
+      </div>
+
+      <div class="tool-card">
+        <h2>Split PDF</h2>
+        <p>Extract selected pages from a PDF.</p>
+        <a href="pages/split.html" class="tool-btn">Open</a>
+      </div>
+
+      <div class="tool-card">
+        <h2>Image to PDF</h2>
+        <p>Convert images into a single PDF.</p>
+        <a href="pages/image-to-pdf.html" class="tool-btn">Open</a>
+      </div>
+
+      <div class="tool-card">
+        <h2>PDF to Image</h2>
+        <p>Convert PDF pages into images.</p>
+        <a href="pages/pdf-to-image.html" class="tool-btn">Open</a>
+      </div>
+
+      <div class="tool-card coming-soon">
+        <h2>Compress PDF</h2>
+        <p>Reduce PDF file size.</p>
+        <span class="disabled">Coming Soon</span>
+      </div>
+
+      <div class="tool-card coming-soon">
+        <h2>Add Page Numbers</h2>
+        <p>Insert page numbers into PDF.</p>
+        <span class="disabled">Coming Soon</span>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer will be injected here -->
+  <div id="footer"></div>
+
+  <!-- Component loader -->
+  <script src="js/include.js"></script>
+</body>
+</html>
