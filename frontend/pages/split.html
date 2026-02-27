@@ -15,10 +15,14 @@
   <!-- Header -->
   <div id="header"></div>
 
-  <main class="tool-page split-controller">
-    <!-- <h1>Split PDF</h1>
-    <p>Upload a PDF and extract a specific page range.</p> -->
-    <div class="pdfPreview"></div>
+  <div class="split-main-section">
+
+      <div class="pdf-viewer" id="pdfViewer">
+        <p class="placeholder">PDF preview will appear here</p>
+      </div>
+
+   <main class="tool-page split-controller">
+
     <form class="tool-form" id="splitForm">
       <h1>Split PDF</h1>
       <p>Upload a PDF and extract a specific page range.</p>
@@ -48,10 +52,15 @@
         placeholder="e.g. 5"
       />
 
-      <button type="button" class="tool-btn primary" id="splitBtn" disabled>
-        Split PDF
-      </button>
-      <div id="splitStatus"></div>
+      <div class="tool-form-btn">
+        <button type="button" class="tool-btn primary" id="splitBtn" disabled>
+          Split PDF
+        </button>
+        <button type="button" class="tool-btn success download-btn hidden" id="downloadSplitBtn">
+          ⬇ Download
+        </button>
+      </div>
+      <div style="background-color: lightblue;" id="splitStatus"></div>
     </form>
 
     <!-- Result / messages -->
@@ -59,7 +68,7 @@
       <!-- success or error message will appear here later -->
     </div>
   </main>
-
+</div>
   <!-- Footer -->
   <div id="footer"></div>
 

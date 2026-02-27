@@ -8,6 +8,7 @@
   <!-- Global CSS -->
   <link rel="stylesheet" href="../css/main.css" />
   <link rel="stylesheet" href="../css/tool.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body data-root="..">
@@ -15,46 +16,54 @@
   <!-- Header -->
   <div id="header"></div>
 
-  <main class="tool-page">
-    <h1>Merge PDF Files</h1>
-    <p>Select multiple PDF files and merge them into a single document.</p>
+  <div class="merge-pdf">
+    <div class="upload-section">
+      <h1>Merge PDF Files</h1>
+      <p>Select multiple PDF files and merge them into a single document.</p>
+      <div class="pdfInputBtn add-pdf">
+        <span>Choose PDFs</span>
+        <input
+          type="file"
+          id="pdfInput"
+          class="pdfInput"
+          name="pdfFile"
+          accept="application/pdf"
+          multiple
+        />
+      </div>
+    </div>
 
-    <form class="tool-form" id="mergeForm">
+    <div id="previewContainer" class="pdf-grid">
+    </div>
 
-      <!-- Hidden file input (required for Add PDFs button) -->
-      <input
-        type="file"
-        id="pdfInput"
-        accept="application/pdf"
-        multiple
-        hidden
-      />
-      <!-- PDF Grid Area -->
-      <div class="merge-workspace">
-        <div class="pdf-grid" id="pdfGrid">
-          <!-- PDF cards -->
+    <main class="tool-page hidden">
+      <form action="" class="tool-form" id="mergeForm">
+        <h1>Merge PDF Files</h1>
+        <p>Select multiple PDF files and merge them into a single document.</p>
+        <!-- Tool form buttons -->
+        <div class="tool-form-btn">
+          <button type="button" class="tool-btn secondary add-pdf" id="addPdfBtn">
+            + Add PDFs
+          </button>
+          <button type="submit" class="tool-btn primary btn-merge-pdf" id="mergeBtn" disabled>Merge PDFs</button>
+          <button type="button" class="tool-btn success download-btn hidden" id="downloadMergedBtn">
+            ⬇ Download
+          </button>
         </div>
-      </div>
+      </form>
+    </main>
 
-      <!-- Action Bar -->
-      <div class="merge-actions">
-
-        <!-- Status text -->
-        <div id="mergeStatus" class="merge-status"></div>
-
-
-        <button type="button" class="tool-btn secondary" id="addPdfBtn">
-          + Add PDFs
-        </button>
-
-        <button type="submit" class="tool-btn primary" id = "mergeBtn" disabled>
-          Merge PDFs
-        </button>
-      </div>
-
-    </form>
-
-</main>
+    <!-- Mobile view buttons-->
+    <div class="tool-form-btn mobile-view-btn hidden-on-mobile">
+      <button type="button" class="tool-btn secondary add-pdf">
+        + Add PDFs
+      </button>
+      <button type="submit" class="tool-btn primary btn-merge-pdf" id="mergePdfMobile">Merge PDFs</button>
+      <button type="button" class="tool-btn success download-btn hidden" id="downloadMergedBtnMobile">
+        ⬇ Download
+      </button>
+    </div>
+  </div>
 
   <!-- Footer -->
   <div id="footer"></div>

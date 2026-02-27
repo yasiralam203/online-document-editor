@@ -1,14 +1,107 @@
-const addPdfBtn = document.getElementById("addPdfBtn");
-const pdfInput = document.getElementById("pdfInput");
-const pdfGrid = document.getElementById("pdfGrid");
-const mergeBtn = document.getElementById("mergeBtn");
-const mergeStatus = document.getElementById("mergeStatus");
+// ========================================
+// PDF MERGE - JAVASCRIPT
+// ========================================
 
+// ========== 1. SELECT HTML ELEMENTS ==========
+// File input element
+const pdfInput = document.getElementById("pdfInput");
+
+// Main container sections
+const mergePdfMain = document.querySelector(".merge-pdf");
+const uploadSection = document.querySelector(".upload-section");
+const toolSection = document.querySelector(".tool-page");
+const previewContainer = document.getElementById('previewContainer');
+
+// Buttons
+const mergeBtn = document.getElementById("mergeBtn");
+const addPdf = document.querySelectorAll(".add-pdf");
+const btnMergePdf = document.querySelectorAll(".btn-merge-pdf");
+const mergePdfMobile = document.getElementById("mergePdfMobile");
+const buttonOnMobile = document.querySelector(".mobile-view-btn");
+
+// Form
+const mergeForm = document.getElementById("mergeForm");
+
+// ========== 2. GLOBAL VARIABLES ==========
 let selectedFiles = [];
 let draggedIndex = null;
+let mergedFileData = null;
+
+// ========== 2.5. DOWNLOAD HELPER FUNCTION ==========
+const downloadFile = (blob, filename) => {
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
+  a.remove();
+};
+
+// ========== 3. UPLOAD BUTTON SETUP ==========
+// Allow users to click "Add PDFs" buttons to select files
+
+addPdf.forEach(btn => {
+  btn.addEventListener("click", () => {
+    pdfInput.click();
+  });
+});
+
+// ========== 4. HANDLE FILE SELECTION ==========
+// When user selects PDFs from file input, add them to our array
+
+pdfInput.addEventListener('change', (e) => {
+  // Convert FileList to an array
+  const newFiles = Array.from(e.target.files);
+  
+  // Add each PDF to our selectedFiles array (avoid duplicates)
+  newFiles.forEach(file => {
+    if (!isDuplicate(file)) {
+      selectedFiles.push(file);
+    }
+  });
+  
+  // Update the UI to show uploaded PDFs
+  updatePreviewContainer();
+  renderPdfList();
+  
+  // Clear the input so user can select more files
+  pdfInput.value = '';
+});
+
+// ========== 5. UPDATE UI VISIBILITY ==========
+// Show/hide different sections based on whether user has uploaded PDFs
+
+const updatePreviewContainer = () => {
+  if (selectedFiles.length > 0) {
+    // User has PDFs: Show preview and merge button
+    mergePdfMain.classList.add("merge-pdf-main-section");
+    uploadSection.classList.add("hidden");
+    toolSection.classList.remove("hidden");
+    mergeBtn.removeAttribute("disabled");
+    
+    // Mobile: Show mobile buttons
+    buttonOnMobile.classList.remove("hidden-on-mobile");
+    mergePdfMobile.removeAttribute("disabled");
+  } else {
+    // No PDFs: Show upload area, hide merge button
+    mergePdfMain.classList.remove("merge-pdf-main-section");
+    uploadSection.classList.remove("hidden");
+    toolSection.classList.add("hidden");
+    mergeBtn.setAttribute("disabled", true);
+    
+    // Mobile: Hide mobile buttons
+    buttonOnMobile?.classList.add("hidden-on-mobile");
+    mergePdfMobile?.setAttribute("disabled", true);
+  }
+};
+
+// ========== 6. HELPER FUNCTIONS ==========
 
 const isDuplicate = file => {
-  return selectedFiles.some(f => f.name === f.name && f.size === file.size);
+  return selectedFiles.some(f => f.name === file.name && f.size === file.size);
 };
 
 function updateMergeButtonState() {
@@ -19,40 +112,11 @@ function updateMergeButtonState() {
   }
 }
 
-const clearMergeStatus = (delay = 5000) => {
-  setTimeout(() => {
-    mergeStatus.textContent = "";
-    mergeStatus.className = "merge-status";
-  }, delay);
-};
+// ========== 7. RENDER PDF LIST ==========
+// Display all selected PDFs in a grid with drag and drop support
 
-/* Open file picker */
-addPdfBtn.addEventListener("click", () => {
-  pdfInput.click();
-  clearMergeStatus(0);
-});
-
-/* Add files */
-pdfInput.addEventListener("change", () => {
-  const files = Array.from(pdfInput.files);
-
-  files.forEach(file => {
-    if (isDuplicate(file)) {
-      return;
-    }
-      selectedFiles.push(file);
-  });
-
-  renderPdfList();
-  pdfInput.value = "";
-
-  updateMergeButtonState();
-
-});
-
-/* Render PDF list */
 function renderPdfList() {
-  pdfGrid.innerHTML = "";
+  previewContainer.innerHTML = "";
 
   selectedFiles.forEach((file, index) => {
     const card = document.createElement("div");
@@ -63,26 +127,30 @@ function renderPdfList() {
     card.innerHTML = `
       <div class="pdf-thumbnail">📄</div>
       <div class="pdf-name">${file.name}</div>
-      <button class="remove-btn" title="Remove PDF">✖</button>
+      <button class="merge-remove-btn" type="button" title="Remove PDF">✖</button>
     `;
 
     addDragEvents(card);
 
     // Remove logic
-    card.querySelector(".remove-btn").addEventListener("click", () => {
+    card.querySelector(".merge-remove-btn").addEventListener("click", (e) => {
+      e.preventDefault();
       selectedFiles.splice(index, 1);
       renderPdfList();
+      updatePreviewContainer();
+      updateMergeButtonState();
     });
 
-    pdfGrid.appendChild(card);
-
-    updateMergeButtonState();
-    clearMergeStatus(0);
+    previewContainer.appendChild(card);
   });
+
+  updateMergeButtonState();
 }
 
 
-/* Drag logic */
+// ========== 8. DRAG & DROP REORDERING ==========
+// Allow users to drag PDFs to reorder them
+
 function addDragEvents(card) {
   card.addEventListener("dragstart", (e) => {
     draggedIndex = Number(card.dataset.index);
@@ -111,16 +179,15 @@ function addDragEvents(card) {
   });
 }
 
-//backend integration
-const mergeForm = document.getElementById("mergeForm");
+// ========== 9. MERGE PDFS ==========
+// Handle form submission to merge PDFs
 
 mergeForm.addEventListener("submit", async (e) => {
-  e.preventDefault();//prevent reload event(e)
+  e.preventDefault();
 
   if (selectedFiles.length < 2) return;
 
-  const formData = new FormData(); //object stored in formData
-  
+  const formData = new FormData();
 
   // IMPORTANT: order is preserved
   selectedFiles.forEach(file => {
@@ -129,43 +196,70 @@ mergeForm.addEventListener("submit", async (e) => {
 
   try {
     mergeBtn.disabled = true;
-    mergeBtn.textContent = "merging...";
-
-    mergeStatus.textContent = "Merging PDFs…";
-    mergeStatus.className = "merge-status loading";
-
     mergeBtn.textContent = "Merging…";
+    mergePdfMobile.disabled = true;
+    mergePdfMobile.textContent = "Merging…";
 
-
-    const response = await fetch("http://localhost:3000/pdf/merge", {
+    const response = await fetch("/pdf/merge", {
       method: "POST",
       body: formData
     });
 
-
     if (!response.ok) {
       throw new Error("Merge failed");
-      clearMergeStatus();
     }
 
-    const fileData = await response.blob();//raw binary data
-    const url = window.URL.createObjectURL(fileData);// create a temporary URL
-
-    //open in New tab
+    const fileData = await response.blob();
+    mergedFileData = fileData;
+    const url = window.URL.createObjectURL(fileData);
+    
+    // Show download button
+    const downloadBtn = document.getElementById("downloadMergedBtn");
+    const downloadBtnMobile = document.getElementById("downloadMergedBtnMobile");
+    if (downloadBtn) downloadBtn.classList.remove("hidden");
+    if (downloadBtnMobile) downloadBtnMobile.classList.remove("hidden");
+    
+    // Open in new tab
     window.open(url, "_blank");
 
-    mergeStatus.textContent = "Merged successfully. Opened in new tab.";
-    mergeStatus.className = "merge-status success";
-
-
   } catch (error) {
+    console.error("Error merging PDFs:", error);
     alert("Failed to merge PDFs");
-    console.log(error);
-    mergeStatus.textContent = "Failed to merge PDFs.";
-    mergeStatus.className = "merge-status error";
   } finally {
-    mergeBtn.disabled = false;
+    mergeBtn.disabled = selectedFiles.length < 2;
     mergeBtn.textContent = "Merge PDFs";
+    mergePdfMobile.disabled = selectedFiles.length < 2;
+    mergePdfMobile.textContent = "Merge PDFs";
   }
-
 });
+
+// ========== 10. MOBILE MERGE BUTTON ==========
+// Handle mobile mDOWNLOAD BUTTON HANDLERS ==========
+const downloadMergedBtn = document.getElementById("downloadMergedBtn");
+const downloadMergedBtnMobile = document.getElementById("downloadMergedBtnMobile");
+
+if (downloadMergedBtn) {
+  downloadMergedBtn.addEventListener("click", () => {
+    if (mergedFileData) {
+      downloadFile(mergedFileData, "merged.pdf");
+    }
+  });
+}
+
+if (downloadMergedBtnMobile) {
+  downloadMergedBtnMobile.addEventListener("click", () => {
+    if (mergedFileData) {
+      downloadFile(mergedFileData, "merged.pdf");
+    }
+  });
+}
+
+// ========== 12. erge button submit
+mergePdfMobile?.addEventListener("click", (e) => {
+  e.preventDefault();
+  mergeForm.dispatchEvent(new Event("submit"));
+});
+
+// ========== 11. CALL INITIAL SETUP ==========
+// Initialize UI on page load
+updatePreviewContainer();

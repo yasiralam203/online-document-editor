@@ -1,6 +1,6 @@
 import fs from "fs";
 import { PDFDocument } from "pdf-lib";
-
+import { degrees } from 'pdf-lib';//used for drawImage on pdf
 //merge pdfs...
 export const mergePdf = async (req, res) => {
     try {
@@ -97,5 +97,54 @@ export const splitPdf = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Failed to split PDF" });
+    }
+};
+
+
+//image to pdfs
+export const imageToPdf = async (req, res) => {
+    try {
+        // console.log(
+        //   req.files.map(f => ({
+        //     name: f.originalname,
+        //     type: f.mimetype,
+        //     size: f.size
+        //   }))
+        // );
+
+        // res.status(200).json({ message: "Images received" });
+
+        const pdfDoc = await PDFDocument.create();
+        //==================== embed each image ============================
+        for(const file of req.files) {
+            let image;
+            if(file.mimetype === "image/png") {
+                // Embed the PNG file buffer into the PDF(for pdfDoc) and return an image object
+                image = await pdfDoc.embedPng(file.buffer);
+            } else {
+                image = await pdfDoc.embedJpg(file.buffer);
+            }
+            const page = pdfDoc.addPage([image.width, image.height]);//page added to pdfDoc
+            //===== draw image on the page============
+            page.drawImage (image, {
+                x: 0,
+                y: 0,
+                width: image.width,
+                height: image.height
+            });
+        }
+        console.log("All images added to pdf");
+        const pdfBytes = await pdfDoc.save(); //gives raw pdf bytes
+
+        res.set({
+            "content-type": "application/pdf",
+            "content-Disposition": "attachment; filename=image-to-pdf.pdf"//later replace inline with attachment
+        });
+
+        res.send(Buffer.from(pdfBytes));
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Image to PDF failed" });
     }
 };

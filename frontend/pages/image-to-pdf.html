@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image To Pdf</title>
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/tool.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body data-root="..">
+    
+    <!-- Header -->
+    <div id="header"></div>
+
+    <div class="image-to-pdf">
+        <div class="upload-section">
+            <h1>Convert Image To PDFs</h1>
+            <p>Select one or multiple images and convert them into single PDFs</p>
+            <div class="imgInputBtn add-image">
+                <span>Choose Images</span>
+                <input
+                    type="file"
+                    id="imgInput"
+                    class="imgInput"
+                    name="imgFile"
+                    accept="image/*"
+                    multiple
+                />
+            </div>    
+        </div>
+        <!-- <div class="image-workspace hidden">
+            <div class="image-grid"> image preview here</div>
+        </div>         -->
+        <div id="previewContainer" class="image-grid">
+        </div>
+        
+
+        <main class="tool-page hidden">
+            <form action="" class="tool-form" id="imgToPdf">
+                <h1>Convert Image To PDFs</h1>
+                <p>Select one or multiple images and convert them into single PDFs</p>
+                <!--tool - form -->
+                <div class="tool-form-btn">
+                    <button type="button" class="tool-btn secondary add-image" id="addImgBtn">
+                        + Add Images
+                    </button>
+                    <button type="submit" class="tool-btn primary btn-convert-pdf" id = "imgToPdfBtn" disabled>Convert to PDF</button>
+                    <button type="button" class="tool-btn success download-btn hidden" id="downloadImagePdfBtn">
+                        ⬇ Download
+                    </button>
+                </div>
+            </form>
+        </main>
+
+        <!-- mobile view buttons-->
+         <div class="tool-form-btn mobile-view-btn hidden-on-mobile" >
+            <button type="button" class="tool-btn secondary add-image">
+                + Add Images
+            </button>
+            <button type="submit" class="tool-btn primary btn-convert-pdf" id="ConvertToPdfMobile">Convert to PDF</button>
+            <button type="button" class="tool-btn success download-btn hidden" id="downloadImagePdfBtnMobile">
+                ⬇ Download
+            </button>
+        </div>
+    </div>
+       <!-- Footer -->
+  <div id="footer"></div>
+
+  <!-- Scripts -->
+  <script src="../js/include.js"></script>
+  <script src="../js/image-to-pdf.js"></script>
+</body>
+</html>
