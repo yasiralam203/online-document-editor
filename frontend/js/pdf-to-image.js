@@ -1,30 +1,30 @@
 // ========================================
-// IMAGE TO PDF CONVERTER - JAVASCRIPT
+// PDF TO IMAGE CONVERTER - JAVASCRIPT
 // ========================================
 
 // ========== 1. SELECT HTML ELEMENTS ==========
 // These variables store references to HTML elements we want to control
 
 // File input element (hidden, but triggered by buttons)
-const imgInput = document.getElementById("imgInput");
+const pdfInput = document.getElementById("pdfInput");
 
 // Main container sections
-const imgMainSection = document.querySelector(".image-to-pdf");
+const pdfMainSection = document.querySelector(".pdf-to-image");
 const uploadSection = document.querySelector(".upload-section");
 const toolSection = document.querySelector(".tool-page");
 const previewContainer = document.getElementById('previewContainer');
 
 // Buttons
-const imgToPdfBtn = document.getElementById("imgToPdfBtn");
-const addImage = document.querySelectorAll(".add-image");
-const btnConvertPdf = document.querySelectorAll(".btn-convert-pdf");
-const convertToPdfMobile = document.getElementById("ConvertToPdfMobile");
+const pdfToImageBtn = document.getElementById("pdfToImageBtn");
+const addPdf = document.querySelectorAll(".add-pdf");
+const btnConvertImage = document.querySelectorAll(".btn-convert-image");
+const convertToImageMobile = document.getElementById("ConvertToImageMobile");
 const buttonOnMobile = document.querySelector(".mobile-view-btn");
 
 // ========== 2. GLOBAL VARIABLES ==========
 // These store data used across the entire application
 
-// Array to store all selected image files
+// Array to store all selected PDF files
 const filesArray = [];
 
 // Store converted file data for download
@@ -44,59 +44,59 @@ const downloadFile = (blob, filename) => {
 };
 
 // ========== 3. UPLOAD AREA SETUP ==========
-// Allow users to click "Add Images" buttons to select files
+// Allow users to click "Add PDFs" buttons to select files
 
-addImage.forEach(btn => {
+addPdf.forEach(btn => {
     btn.addEventListener("click", () => {
-        // When user clicks "Add Images" button, trigger file input
-        imgInput.click();
+        // When user clicks "Add PDFs" button, trigger file input
+        pdfInput.click();
     });
 });
 
 // ========== 4. HANDLE FILE SELECTION ==========
-// When user selects images from file input, add them to our array
+// When user selects PDFs from file input, add them to our array
 
-imgInput.addEventListener('change', (e) => {
+pdfInput.addEventListener('change', (e) => {
     // Convert FileList to an array
-    const newImages = Array.from(e.target.files);
+    const newPdfs = Array.from(e.target.files);
     
-    // Add each image to our filesArray
-    newImages.forEach(image => {
-        filesArray.push(image);
+    // Add each PDF to our filesArray
+    newPdfs.forEach(pdf => {
+        filesArray.push(pdf);
     });
     
-    // Update the UI to show uploaded images
+    // Update the UI to show uploaded PDFs
     updatePreviewContainer();
     renderPreviews();
     
     // Clear the input so user can select more files
-    imgInput.value = '';
+    pdfInput.value = '';
 });
 
 // ========== 5. UPDATE UI VISIBILITY ==========
-// Show/hide different sections based on whether user has uploaded images
+// Show/hide different sections based on whether user has uploaded PDFs
 
 const updatePreviewContainer = () => {
     if (filesArray.length > 0) {
-        // User has images: Show preview and convert button
-        imgMainSection.classList.add("image-pdf-main-section");
+        // User has PDFs: Show preview and convert button
+        pdfMainSection.classList.add("image-pdf-main-section");
         uploadSection.classList.add("hidden");
         toolSection.classList.remove("hidden");
-        imgToPdfBtn.removeAttribute("disabled");
+        pdfToImageBtn.removeAttribute("disabled");
         
         // Mobile: Show mobile buttons
         buttonOnMobile.classList.remove("hidden-on-mobile");
-        convertToPdfMobile.removeAttribute("disabled");
+        convertToImageMobile.removeAttribute("disabled");
     } else {
-        // No images: Show upload area, hide convert button
-        imgMainSection.classList.remove("image-pdf-main-section");
+        // No PDFs: Show upload area, hide convert button
+        pdfMainSection.classList.remove("image-pdf-main-section");
         uploadSection.classList.remove("hidden");
         toolSection.classList.add("hidden");
-        imgToPdfBtn.setAttribute("disabled", true);
+        pdfToImageBtn.setAttribute("disabled", true);
         
         // Mobile: Hide mobile buttons
         buttonOnMobile?.classList.add("hidden-on-mobile");
-        convertToPdfMobile?.setAttribute("disabled", true);
+        convertToImageMobile?.setAttribute("disabled", true);
     }
 };
 
@@ -136,19 +136,19 @@ function handleDrop(e) {
     // Get dropped files
     const droppedFiles = Array.from(e.dataTransfer.files);
     
-    // Filter to only image files
-    const imageFiles = droppedFiles.filter(file => file.type.startsWith('image/'));
+    // Filter to only PDF files
+    const pdfFiles = droppedFiles.filter(file => file.type === 'application/pdf');
     
-    if (imageFiles.length > 0) {
-        // Add images to our array
-        filesArray.concat(imageFiles).forEach(img => filesArray.push(img));
+    if (pdfFiles.length > 0) {
+        // Add PDFs to our array
+        filesArray.concat(pdfFiles).forEach(pdf => filesArray.push(pdf));
         updatePreviewContainer();
         renderPreviews();
     }
 }
 
 // Setup drag and drop on multiple areas
-const dragZones = [uploadSection, previewContainer, imgMainSection];
+const dragZones = [uploadSection, previewContainer, pdfMainSection];
 
 dragZones.forEach(zone => {
     // Prevent browser default behavior
@@ -170,19 +170,22 @@ dragZones.forEach(zone => {
     zone.addEventListener('drop', handleDrop, false);
 });
 
-// ========== 7. CREATE IMAGE PREVIEW CARDS ==========
-// This is the main function that creates and displays all image cards
+// ========== 7. CREATE PDF PREVIEW CARDS ==========
 
+// Add this near your GLOBAL VARIABLES at the top of the file
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ========== 7. CREATE PDF PREVIEW CARDS ==========
 const renderPreviews = () => {
     // Clear previous cards from the container
     previewContainer.innerHTML = '';
     
-    // Create a card for each image in our filesArray
+    // Create a card for each PDF in our filesArray
     filesArray.forEach((file, index) => {
         // ===== Create the card's HTML structure =====
         const card = document.createElement('div');
         card.className = 'image-card';
-        card.dataset.index = index;  // Store which image this card represents
+        card.dataset.index = index;  // Store which PDF this card represents
         
         // Create remove button (X)
         const removeBtn = document.createElement('button');
@@ -190,19 +193,42 @@ const renderPreviews = () => {
         removeBtn.innerHTML = '<i class="fas fa-times"></i>';
         removeBtn.onclick = () => removeFile(index);
         
-        // Create image container
+        // Create PDF image wrapper
         const imgWrapper = document.createElement('div');
         imgWrapper.className = 'img-wrapper';
-        
-        // Read the file and convert it to display-able format (Base64)
+        imgWrapper.style.backgroundColor = '#FFF3E0';
+
+        // --- PDF.JS REAL THUMBNAIL LOGIC ---
+        // Create a canvas element instead of an icon
+        const canvas = document.createElement('canvas');
+        canvas.style.maxWidth = '100%';
+        canvas.style.maxHeight = '100%';
+        canvas.style.objectFit = 'contain';
+        imgWrapper.appendChild(canvas);
+
+        // Read the file and render the first page
         const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = document.createElement('img');
-            img.src = e.target.result;  // Set image source
-            img.alt = file.name;
-            imgWrapper.appendChild(img);
+        reader.onload = async function() {
+            const typedarray = new Uint8Array(this.result);
+            try {
+                const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                const page = await pdf.getPage(1);
+                
+                // Keep the scale small to generate the thumbnail quickly
+                const viewport = page.getViewport({ scale: 0.5 }); 
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                
+                const context = canvas.getContext('2d');
+                await page.render({ canvasContext: context, viewport: viewport }).promise;
+            } catch (error) {
+                console.error("Error rendering PDF preview:", error);
+                // Fallback to text if PDF preview fails
+                imgWrapper.innerHTML = '<span style="color:#e74c3c; font-weight:bold;">PDF</span>';
+            }
         };
-        reader.readAsDataURL(file);  // Convert file to Base64
+        reader.readAsArrayBuffer(file);
+        // -----------------------------------
         
         // Create filename text
         const fileName = document.createElement('div');
@@ -214,26 +240,25 @@ const renderPreviews = () => {
         card.appendChild(imgWrapper);
         card.appendChild(fileName);
         
-        // Add the completed card to the page
+        // ===== APPEND TO CONTAINER (Typo fixed!) =====
         previewContainer.appendChild(card);
     });
     
     // Update UI showing convert button, etc.
     updatePreviewContainer();
 };
-
-// ========== 8. REMOVE IMAGE ==========
-// When user clicks the X button on a card, remove that image
+// ========== 8. REMOVE PDF ==========
+// When user clicks the X button on a card, remove that PDF
 
 const removeFile = (index) => {
-    // Remove image at specified index from our array
+    // Remove PDF at specified index from our array
     filesArray.splice(index, 1);
     // Refresh the preview display
     renderPreviews();
 };
 
 //backend integration
-btnConvertPdf.forEach(btn => {
+btnConvertImage.forEach(btn => {
     btn.addEventListener("click", async (e) => {
         e.preventDefault();//prevent reload event(e)
         console.log("convert button clicked");
@@ -244,40 +269,40 @@ btnConvertPdf.forEach(btn => {
 
           // IMPORTANT: order is preserved
         filesArray.forEach(file => {
-            formData.append("images", file); // 👈 must match multer field
+            formData.append("files", file); // 👈 must match multer field
         });
 
        try {
         btn.disabled = true;
         btn.textContent = "Converting…";
         
-        const response = await fetch("/pdf/image-to-pdf", {
+        const response = await fetch("/pdf/pdf-to-image", {
             method: "POST",
             body: formData
         });
 
         if (!response.ok){
-            throw new Error("Failed to generate PDF");
+            throw new Error("Failed to generate images");
         } 
         const fileData = await response.blob();
         convertedFileData = fileData;
         const url = window.URL.createObjectURL(fileData);
         
         // Show download buttons
-        const downloadBtn = document.getElementById("downloadImagePdfBtn");
-        const downloadBtnMobile = document.getElementById("downloadImagePdfBtnMobile");
+        const downloadBtn = document.getElementById("downloadPdfImageBtn");
+        const downloadBtnMobile = document.getElementById("downloadPdfImageBtnMobile");
         if (downloadBtn) downloadBtn.classList.remove("hidden");
         if (downloadBtnMobile) downloadBtnMobile.classList.remove("hidden");
         
         // Open in new tab
-        window.open(url, "_blank");
+        // window.open(url, "_blank");
        
        } catch (err) {
             console.log(err);
-            alert("Image to PDF failed");
+            alert("PDF to Image failed");
        } finally {
         btn.disabled = false;
-        btn.textContent = "Convert to PDF";
+        btn.textContent = "Convert to Image";
        }
         
 
@@ -285,21 +310,21 @@ btnConvertPdf.forEach(btn => {
 });
 
 // ========== DOWNLOAD BUTTON HANDLERS ==========
-const downloadImagePdfBtn = document.getElementById("downloadImagePdfBtn");
-const downloadImagePdfBtnMobile = document.getElementById("downloadImagePdfBtnMobile");
+const downloadPdfImageBtn = document.getElementById("downloadPdfImageBtn");
+const downloadPdfImageBtnMobile = document.getElementById("downloadPdfImageBtnMobile");
 
-if (downloadImagePdfBtn) {
-  downloadImagePdfBtn.addEventListener("click", () => {
+if (downloadPdfImageBtn) {
+  downloadPdfImageBtn.addEventListener("click", () => {
     if (convertedFileData) {
-      downloadFile(convertedFileData, "images-to-pdf.pdf");
+      downloadFile(convertedFileData, "pdf-to-images.zip");
     }
   });
 }
 
-if (downloadImagePdfBtnMobile) {
-  downloadImagePdfBtnMobile.addEventListener("click", () => {
+if (downloadPdfImageBtnMobile) {
+  downloadPdfImageBtnMobile.addEventListener("click", () => {
     if (convertedFileData) {
-      downloadFile(convertedFileData, "images-to-pdf.pdf");
+      downloadFile(convertedFileData, "pdf-to-images.zip");
     }
   });
 }

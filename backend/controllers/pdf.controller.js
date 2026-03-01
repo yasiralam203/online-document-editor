@@ -1,6 +1,15 @@
 import fs from "fs";
 import { PDFDocument } from "pdf-lib";
 import { degrees } from 'pdf-lib';//used for drawImage on pdf
+import path, { format } from "path";//safe file path(windows/linux)
+import crypto from "crypto";//generate unique ID
+import archiver from "archiver";
+
+import pdfPoppler from "pdf-poppler";
+import { arch } from "os";
+import { resolve } from "dns";
+import { rejects } from "assert";
+
 //merge pdfs...
 export const mergePdf = async (req, res) => {
     try {
@@ -146,5 +155,140 @@ export const imageToPdf = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Image to PDF failed" });
+    }
+};
+
+
+
+
+
+//========================pdfs - to - image ============================================
+
+
+export const pdfToImage = async (req, res) => {
+    try {
+        console.log(
+          req.files.map(f => ({
+            name: f.originalname,
+            type: f.mimetype,
+            size: f.size
+          }))
+        );
+
+
+        const cleanupFolder = (folderPath) => {
+        fs.rm(folderPath, { recursive: true, force: true }, (err) => {
+            if (err) {
+            console.error("Cleanup failed:", err);
+            } else {
+            console.log("Cleaned up:", folderPath);
+            }
+        });
+        };
+        // res.status(200).json({ message: "pdf received" });
+        //folder creation for user
+        const requestId = crypto.randomUUID();
+        const baseDir = path.join(
+            process.cwd(),
+            "temp",
+            "pdf-to-image",
+            requestId
+        );
+        const uploadDir = path.join(baseDir, "uploads");
+        const imageDir = path.join(baseDir, "images");
+
+        fs.mkdirSync(uploadDir, {recursive: true});//create folder recusive:true means if folder not present create it
+        fs.mkdirSync(imageDir, {recursive: true});
+
+        //move pdf file to new folder
+        req.files.forEach((file) => {
+            const newPath = path.join(uploadDir, file.originalname);
+            fs.renameSync(file.path, newPath);
+
+            console.log("Moved file to:", newPath);
+        });
+
+        
+        // res.status(200).json({message: "Files recieved and organized" });
+
+
+        const pdfFiles = fs.readdirSync(uploadDir);
+        console.log("PDFs to merge:", pdfFiles);
+        //merge logic
+        const mergedPdf = await PDFDocument.create();
+
+        for (const fileName of pdfFiles) {
+            const filePath = path.join(uploadDir, fileName);
+            const pdfBytes = fs.readFileSync(filePath);//convert to binary
+
+            const pdfDoc = await PDFDocument.load(pdfBytes);
+            console.log("Loading PDF:", fileName);
+
+            //copy pages
+            const copiedPages = await mergedPdf.copyPages(
+                pdfDoc,
+                pdfDoc.getPageIndices()
+            );
+            copiedPages.forEach(page => mergedPdf.addPage(page));
+        }
+
+        const mergedPdfBytes = await mergedPdf.save();
+        
+
+        const mergedDir = path.join(baseDir, "merged");
+        fs.mkdirSync(mergedDir, {recursive: true});
+        const mergedPdfPath = path.join(mergedDir, "merged.pdf");
+        fs.writeFileSync(mergedPdfPath, mergedPdfBytes);
+
+        console.log("Merged PDF created at:", mergedPdfPath);
+        //merge logic end================//
+
+        // res.status(200).json({message: "merged pdf created successfully"});
+
+        //pdf to image using poppler
+        const outputDir = imageDir;
+        const options = {
+            format: "png",
+            out_dir: outputDir,
+            out_prefix: "page",
+            page: null // null = convert All pages
+        };
+
+        await pdfPoppler.convert(mergedPdfPath, options);
+
+        const imageFiles = fs.readdirSync(outputDir);
+        console.log("Generated images:", imageFiles);
+
+        //zip images
+        const zipPath = path.join(baseDir, "images.zip");//zip path
+        const output = fs.createWriteStream(zipPath);
+        const archive = archiver("zip", {zlib: {level: 9}});
+        archive.pipe(output);
+        archive.directory(imageDir, false); //false = dont nest inside another folder
+        await archive.finalize();
+
+        //wait until zip is fully written
+        await new Promise((resolve, reject) => {
+            output.on("close", resolve);
+            archive.on("error", reject);
+        });
+
+
+
+        res.set({
+        "Content-Type": "application/zip",
+        "Content-Disposition": "attachment; filename=pdf-images.zip"
+        });
+        res.sendFile(zipPath);
+
+        // cleanup after delay (allows multiple downloads)
+        setTimeout(() => {
+            cleanupFolder(baseDir);
+        }, 2 * 60 * 1000);
+
+
+    } catch (error) {
+        console.error("PDF to Image error:", error);
+        res.status(500).json({ error: "PDF to Image failed" });
     }
 };
