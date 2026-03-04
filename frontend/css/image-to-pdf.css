@@ -1,0 +1,148 @@
+/* ===== image-to-pdf.css ===== */
+
+
+
+.imgInput {
+    display: none;
+}
+
+.imgInputBtn {
+    padding: 18px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: center;
+    width: 200px;
+    background-color: #2563eb;
+    color: white;
+    margin-top: 6%;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 16px;
+}
+
+.imgInputBtn:hover {
+    background-color: #1d4ed8;
+}
+
+/* Preview Grid (The Cards) */
+.preview-grid {
+    max-height: 85%;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 20px;
+    justify-content: center;
+    padding: 20px;
+    height: fit-content;
+}
+
+/* Individual Card Style */
+.image-card {
+    background: white;
+    padding: 8px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s, opacity 0.2s, background-color 0.2s;
+    cursor: move;
+    border-left: 3px solid transparent;
+    touch-action: none;
+    user-select: none;
+}
+
+.image-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.image-card.dragging {
+    opacity: 0.5;
+    background-color: #f0f4ff;
+    border-left: 3px solid #2563eb;
+}
+
+.image-card.drag-over-card {
+    opacity: 0.8;
+    background-color: #e0e9ff;
+    border-left: 3px solid #1d4ed8;
+    box-shadow: 0 0 8px rgba(37, 99, 235, 0.3);
+}
+
+/* Image container inside card to maintain aspect ratio look */
+.img-wrapper {
+    width: 100%;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 6px;
+    overflow: hidden;
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    pointer-events: none;
+}
+
+.img-wrapper img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.img-wrapper i {
+    font-size: 48px;
+    line-height: 1;
+}
+
+.file-name {
+    font-size: 11px;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    text-align: center;
+    line-height: 1.3;
+    pointer-events: none;
+}
+
+/* Remove Button (X) - Image to PDF */
+.image-remove-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    font-size: 12px;
+    transition: background 0.2s;
+    pointer-events: auto;
+    z-index: 10;
+}
+
+.image-remove-btn:hover {
+    background-color: #d90000;
+}
+
+/* Convert Button appearing after upload */
+.btn-convert {
+    background-color: #333;
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 30px;
+}

@@ -18,8 +18,6 @@ const previewContainer = document.getElementById('previewContainer');
 const pdfToImageBtn = document.getElementById("pdfToImageBtn");
 const addPdf = document.querySelectorAll(".add-pdf");
 const btnConvertImage = document.querySelectorAll(".btn-convert-image");
-const convertToImageMobile = document.getElementById("ConvertToImageMobile");
-const buttonOnMobile = document.querySelector(".mobile-view-btn");
 
 // ========== 2. GLOBAL VARIABLES ==========
 // These store data used across the entire application
@@ -47,9 +45,12 @@ const downloadFile = (blob, filename) => {
 // Allow users to click "Add PDFs" buttons to select files
 
 addPdf.forEach(btn => {
-    btn.addEventListener("click", () => {
-        // When user clicks "Add PDFs" button, trigger file input
-        pdfInput.click();
+    btn.addEventListener("click", (e) => {
+        // Prevent double-triggering if the user clicked the input itself
+        if (e.target.id !== "pdfInput") {
+            // When user clicks "Add PDFs" button, trigger file input
+            pdfInput.click();
+        }
     });
 });
 
@@ -74,29 +75,26 @@ pdfInput.addEventListener('change', (e) => {
 });
 
 // ========== 5. UPDATE UI VISIBILITY ==========
-// Show/hide different sections based on whether user has uploaded PDFs
-
+// This function toggles elements based on whether we have PDFs or not
 const updatePreviewContainer = () => {
+    // Hide download button when file configuration changes
+    const downloadBtn = document.getElementById("downloadPdfImageBtn");
+    if (downloadBtn) {
+        downloadBtn.classList.add("hidden");
+    }
+
     if (filesArray.length > 0) {
-        // User has PDFs: Show preview and convert button
-        pdfMainSection.classList.add("image-pdf-main-section");
-        uploadSection.classList.add("hidden");
-        toolSection.classList.remove("hidden");
-        pdfToImageBtn.removeAttribute("disabled");
-        
-        // Mobile: Show mobile buttons
-        buttonOnMobile.classList.remove("hidden-on-mobile");
-        convertToImageMobile.removeAttribute("disabled");
+        // User has PDFs: Show preview and convert button, hide upload area
+        uploadSection.classList.add('hidden');
+        previewContainer.classList.remove('hidden');
+        toolSection.classList.remove('hidden'); // Ensure toolSection is visible
+        pdfToImageBtn.removeAttribute("disabled"); // Enable convert button
     } else {
-        // No PDFs: Show upload area, hide convert button
-        pdfMainSection.classList.remove("image-pdf-main-section");
-        uploadSection.classList.remove("hidden");
-        toolSection.classList.add("hidden");
-        pdfToImageBtn.setAttribute("disabled", true);
-        
-        // Mobile: Hide mobile buttons
-        buttonOnMobile?.classList.add("hidden-on-mobile");
-        convertToImageMobile?.setAttribute("disabled", true);
+        // No PDFs: Show upload area, hide preview, tool section, and convert button
+        uploadSection.classList.remove('hidden');
+        previewContainer.classList.add('hidden');
+        toolSection.classList.add('hidden'); // Hide toolSection
+        pdfToImageBtn.setAttribute("disabled", true); // Disable convert button
     }
 };
 
@@ -274,8 +272,9 @@ btnConvertImage.forEach(btn => {
 
        try {
         btn.disabled = true;
-        btn.textContent = "Converting…";
-        
+        // btn.textContent = "Converting…";
+        btn.classList.add("btn-loading");
+
         const response = await fetch("/pdf/pdf-to-image", {
             method: "POST",
             body: formData
@@ -290,9 +289,7 @@ btnConvertImage.forEach(btn => {
         
         // Show download buttons
         const downloadBtn = document.getElementById("downloadPdfImageBtn");
-        const downloadBtnMobile = document.getElementById("downloadPdfImageBtnMobile");
         if (downloadBtn) downloadBtn.classList.remove("hidden");
-        if (downloadBtnMobile) downloadBtnMobile.classList.remove("hidden");
         
         // Open in new tab
         // window.open(url, "_blank");
@@ -302,7 +299,8 @@ btnConvertImage.forEach(btn => {
             alert("PDF to Image failed");
        } finally {
         btn.disabled = false;
-        btn.textContent = "Convert to Image";
+        // btn.textContent = "Convert to Image";
+        btn.classList.remove("btn-loading");
        }
         
 
@@ -311,18 +309,9 @@ btnConvertImage.forEach(btn => {
 
 // ========== DOWNLOAD BUTTON HANDLERS ==========
 const downloadPdfImageBtn = document.getElementById("downloadPdfImageBtn");
-const downloadPdfImageBtnMobile = document.getElementById("downloadPdfImageBtnMobile");
 
 if (downloadPdfImageBtn) {
   downloadPdfImageBtn.addEventListener("click", () => {
-    if (convertedFileData) {
-      downloadFile(convertedFileData, "pdf-to-images.zip");
-    }
-  });
-}
-
-if (downloadPdfImageBtnMobile) {
-  downloadPdfImageBtnMobile.addEventListener("click", () => {
     if (convertedFileData) {
       downloadFile(convertedFileData, "pdf-to-images.zip");
     }

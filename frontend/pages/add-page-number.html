@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Page Numbers to PDF</title>
+
+  <!-- Global CSS -->
+  <link rel="stylesheet" href="../css/main.css?v=2" />
+  <link rel="stylesheet" href="../css/tool-layout.css?v=2" />
+  <link rel="stylesheet" href="../css/add-page-number.css?v=1" />
+</head>
+
+<body data-root="..">
+
+  <!-- Header -->
+  <div id="header"></div>
+
+  <!-- ===== Add Page Number Tool Wrapper ===== -->
+  <main class="tool-workspace-layout add-page-number">
+
+    <!-- ===== Upload Section ===== -->
+    <div class="upload-section">
+      <h1>Add Page Numbers</h1>
+      <p>Number the pages of your PDF files easily</p>
+
+      <div class="pdfInputBtn add-pdf">
+        <span>Choose PDF</span>
+        <input type="file" id="pdfInput" class="pdfInput" accept="application/pdf" />
+      </div>
+    </div>
+
+    <!-- ===== Preview Area ===== -->
+    <div id="previewContainer" class="iframe-preview hidden">
+      <!-- PDF preview / thumbnails handled by JS -->
+    </div>
+
+    <!-- ===== Tool Page (Right Panel) ===== -->
+    <main class="tool-page hidden">
+      <form class="tool-form" id="addPageNumberForm">
+
+        <h1>Add Page Numbers</h1>
+        <p>Options</p>
+
+
+        <!-- Position -->
+        <div class="tool-options">
+          <label for="position">Position</label>
+          <select id="position">
+            <option value="Bottom-Center" selected>Bottom Center</option>
+            <option value="Bottom-Left">Bottom Left</option>
+            <option value="Bottom-Right">Bottom Right</option>
+            <option value="Top-Center">Top Center</option>
+            <option value="Top-Left">Top Left</option>
+            <option value="Top-Right">Top Right</option>
+          </select>
+        </div>
+
+        <div class="tool-options margin-info" style="margin-top: 15px; font-size: 0.85rem; color: #555;">
+          Recommended margin styling applies automatically.
+        </div>
+
+        <!-- Buttons -->
+        <div class="tool-form-btn">
+          <button type="button" class="tool-btn secondary add-pdf" id="addPdfBtn">
+            + Change PDF
+          </button>
+
+          <button type="button" class="tool-btn primary" id="addPageNumberBtn" disabled>
+            Add Page Numbers
+          </button>
+
+          <button type="button" class="tool-btn success download-btn hidden" id="downloadBtn">
+            ⬇ Download
+          </button>
+        </div>
+
+      </form>
+    </main>
+
+
+  </main>
+
+
+  <!-- Scripts -->
+  <script src="../js/include.js"></script>
+  <script src="../js/add-page-number.js"></script>
+
+</body>
+
+</html>

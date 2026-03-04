@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compress PDF</title>
+
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="../css/main.css?v=2" />
+    <link rel="stylesheet" href="../css/tool-layout.css?v=2" />
+    <link rel="stylesheet" href="../css/compress.css?v=2" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body data-root="..">
+
+    <!-- Header -->
+    <div id="header"></div>
+
+    <main class="tool-workspace-layout compress-pdf" id="compressPdfMain">
+        <div class="upload-section" id="uploadSection">
+            <h1>Compress PDF files</h1>
+            <p>Reduce file size while optimizing for maximal PDF quality.</p>
+            <label class="pdfInputBtn add-pdf">
+                <span>Choose PDF</span>
+                <input type="file" id="pdfInput" class="pdfInput hidden" name="pdfFile" accept="application/pdf" />
+            </label>
+        </div>
+
+        <div id="previewContainer" class="cards-grid hidden">
+            <!-- Only one card will be shown here -->
+        </div>
+
+        <form action="" class="tool-page hidden" id="compressForm">
+            <div class="tool-form">
+                <h1>Compress PDF</h1>
+                <p>Reduce file size while optimizing for maximal PDF quality.</p>
+
+                <!-- Compression Levels Options -->
+                <div class="compression-levels">
+                    <label class="level-option">
+                        <input type="radio" name="compressionLevel" value="extreme">
+                        <div class="level-icon">
+                            <i class="fa-solid fa-compress" style="color: #ef4444;"></i>
+                        </div>
+                        <div class="level-det">
+                            <span class="level-title">Extreme Compression</span>
+                            <span class="level-desc">Less quality, high compression.</span>
+                        </div>
+                    </label>
+                    <label class="level-option selected">
+                        <input type="radio" name="compressionLevel" value="recommended" checked>
+                        <div class="level-icon">
+                            <i class="fa-solid fa-thumbs-up" style="color: #22c55e;"></i>
+                        </div>
+                        <div class="level-det">
+                            <span class="level-title">Recommended Compression</span>
+                            <span class="level-desc">Good quality, good compression.</span>
+                        </div>
+                    </label>
+                    <label class="level-option">
+                        <input type="radio" name="compressionLevel" value="less">
+                        <div class="level-icon">
+                            <i class="fa-solid fa-compress-arrows-alt" style="color: #2563eb;"></i>
+                        </div>
+                        <div class="level-det">
+                            <span class="level-title">Less Compression</span>
+                            <span class="level-desc">High quality, less compression.</span>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Tool form buttons -->
+                <div class="tool-form-btn">
+                    <button type="submit" class="tool-btn primary btn-compress-pdf" id="compressBtn">Compress
+                        PDF</button>
+                    <button type="button" class="tool-btn success download-btn hidden" id="downloadCompressedBtn">
+                        ⬇ Download
+                    </button>
+                </div>
+            </div>
+        </form>
+    </main>
+
+
+    <!-- Scripts -->
+    <script src="../js/include.js"></script>
+    <script src="../js/compress-pdf.js"></script>
+</body>
+
+</html>

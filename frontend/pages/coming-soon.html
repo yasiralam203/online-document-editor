@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coming Soon | PDF Tools</title>
+
+  <!-- Global CSS (same as index.html) -->
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/tool-layout.css" />
+
+  <!-- Page-specific internal CSS -->
+  <style>
+    .coming-soon-wrapper {
+      min-height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .coming-soon-card {
+      background: #ffffff;
+      padding: 40px 30px;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .coming-soon-card h1 {
+      margin-bottom: 15px;
+      color: #222;
+    }
+
+    .coming-soon-card p {
+      color: #555;
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+
+    .coming-soon-card .note {
+      font-size: 14px;
+      color: #777;
+    }
+
+    .coming-soon-card .tool-btn {
+      margin-top: 25px;
+      display: inline-block;
+    }
+  </style>
+</head>
+
+<!-- IMPORTANT: data-root=".." because file is inside /pages -->
+
+<body data-root="..">
+
+  <!-- Header injected here -->
+  <div id="header"></div>
+
+  <!-- Main content -->
+  <main class="dashboard">
+    <div class="coming-soon-wrapper">
+      <div class="coming-soon-card">
+        <h1>🚧 Coming Soon</h1>
+
+        <p>
+          This feature is planned and will be implemented in a future phase
+          of the project.
+        </p>
+
+        <p class="note">
+          Currently available tools include Merge PDF, Split PDF,
+          Image to PDF, and PDF to Image.
+        </p>
+
+        <a href="../index.html" class="tool-btn">
+          ← Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Component loader (path fixed for /pages) -->
+  <script src="../js/include.js"></script>
+</body>
+
+</html>

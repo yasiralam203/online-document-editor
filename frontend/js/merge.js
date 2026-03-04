@@ -16,8 +16,6 @@ const previewContainer = document.getElementById('previewContainer');
 const mergeBtn = document.getElementById("mergeBtn");
 const addPdf = document.querySelectorAll(".add-pdf");
 const btnMergePdf = document.querySelectorAll(".btn-merge-pdf");
-const mergePdfMobile = document.getElementById("mergePdfMobile");
-const buttonOnMobile = document.querySelector(".mobile-view-btn");
 
 // Form
 const mergeForm = document.getElementById("mergeForm");
@@ -26,6 +24,8 @@ const mergeForm = document.getElementById("mergeForm");
 let selectedFiles = [];
 let draggedIndex = null;
 let mergedFileData = null;
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 // ========== 2.5. DOWNLOAD HELPER FUNCTION ==========
 const downloadFile = (blob, filename) => {
@@ -77,24 +77,16 @@ pdfInput.addEventListener('change', (e) => {
 const updatePreviewContainer = () => {
   if (selectedFiles.length > 0) {
     // User has PDFs: Show preview and merge button
-    mergePdfMain.classList.add("merge-pdf-main-section");
-    uploadSection.classList.add("hidden");
-    toolSection.classList.remove("hidden");
+    uploadSection.classList.add('hidden');
+    previewContainer.classList.remove('hidden');
+    mergeForm.classList.remove('hidden');
     mergeBtn.removeAttribute("disabled");
-    
-    // Mobile: Show mobile buttons
-    buttonOnMobile.classList.remove("hidden-on-mobile");
-    mergePdfMobile.removeAttribute("disabled");
   } else {
     // No PDFs: Show upload area, hide merge button
-    mergePdfMain.classList.remove("merge-pdf-main-section");
-    uploadSection.classList.remove("hidden");
-    toolSection.classList.add("hidden");
+    uploadSection.classList.remove('hidden');
+    previewContainer.classList.add('hidden');
+    mergeForm.classList.add('hidden');
     mergeBtn.setAttribute("disabled", true);
-    
-    // Mobile: Hide mobile buttons
-    buttonOnMobile?.classList.add("hidden-on-mobile");
-    mergePdfMobile?.setAttribute("disabled", true);
   }
 };
 
@@ -110,6 +102,12 @@ function updateMergeButtonState() {
   } else {
     mergeBtn.disabled = false;
   }
+  
+  // Hide download button when file configuration changes
+  const downloadBtn = document.getElementById("downloadMergedBtn");
+  if (downloadBtn) {
+    downloadBtn.classList.add("hidden");
+  }
 }
 
 // ========== 7. RENDER PDF LIST ==========
@@ -124,16 +122,13 @@ function renderPdfList() {
     card.draggable = true;
     card.dataset.index = index;
 
-    card.innerHTML = `
-      <div class="pdf-thumbnail">📄</div>
-      <div class="pdf-name">${file.name}</div>
-      <button class="merge-remove-btn" type="button" title="Remove PDF">✖</button>
-    `;
-
-    addDragEvents(card);
-
-    // Remove logic
-    card.querySelector(".merge-remove-btn").addEventListener("click", (e) => {
+    // Remove button
+    const removeBtn = document.createElement("button");
+    removeBtn.className = "merge-remove-btn";
+    removeBtn.type = "button";
+    removeBtn.title = "Remove PDF";
+    removeBtn.innerHTML = "✖";
+    removeBtn.addEventListener("click", (e) => {
       e.preventDefault();
       selectedFiles.splice(index, 1);
       renderPdfList();
@@ -141,6 +136,48 @@ function renderPdfList() {
       updateMergeButtonState();
     });
 
+    // Thumbnail wrapper
+    const imgWrapper = document.createElement("div");
+    imgWrapper.className = "pdf-thumbnail";
+    imgWrapper.style.pointerEvents = "none";
+
+    const canvas = document.createElement("canvas");
+    canvas.style.maxWidth = "100%";
+    canvas.style.maxHeight = "100%";
+    canvas.style.objectFit = "contain";
+    imgWrapper.appendChild(canvas);
+
+    const reader = new FileReader();
+    reader.onload = async function() {
+        const typedarray = new Uint8Array(this.result);
+        try {
+            const pdf = await pdfjsLib.getDocument(typedarray).promise;
+            const page = await pdf.getPage(1);
+            
+            const viewport = page.getViewport({ scale: 0.5 }); 
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            
+            const context = canvas.getContext("2d");
+            await page.render({ canvasContext: context, viewport: viewport }).promise;
+        } catch (error) {
+            console.error("Error rendering PDF preview:", error);
+            imgWrapper.innerHTML = '📄';
+        }
+    };
+    reader.readAsArrayBuffer(file);
+
+    // File name
+    const fileName = document.createElement("div");
+    fileName.className = "pdf-name";
+    fileName.textContent = file.name;
+    fileName.style.pointerEvents = "none";
+
+    card.appendChild(imgWrapper);
+    card.appendChild(fileName);
+    card.appendChild(removeBtn);
+
+    addDragEvents(card);
     previewContainer.appendChild(card);
   });
 
@@ -154,20 +191,41 @@ function renderPdfList() {
 function addDragEvents(card) {
   card.addEventListener("dragstart", (e) => {
     draggedIndex = Number(card.dataset.index);
-    card.classList.add("dragging");
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", draggedIndex.toString());
+    
+    // Defer visual change so drag image isn't affected
+    setTimeout(() => {
+        card.classList.add("dragging");
+    }, 0);
   });
 
-  card.addEventListener("dragend", () => {
-    card.classList.remove("dragging");
-    draggedIndex = null;
+  card.addEventListener("dragenter", (e) => {
+    e.preventDefault();
+    if (draggedIndex !== null && Number(card.dataset.index) !== draggedIndex) {
+        card.style.transform = "scale(1.02)";
+        card.style.boxShadow = "0 8px 16px rgba(0,0,0,0.1)";
+    }
+  });
+
+  card.addEventListener("dragleave", (e) => {
+    e.preventDefault();
+    card.style.transform = "";
+    card.style.boxShadow = "";
   });
 
   card.addEventListener("dragover", (e) => {
     e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
   });
 
   card.addEventListener("drop", (e) => {
     e.preventDefault();
+    e.stopPropagation();
+    
+    card.style.transform = "";
+    card.style.boxShadow = "";
+
     const targetIndex = Number(card.dataset.index);
 
     if (draggedIndex === null || draggedIndex === targetIndex) return;
@@ -175,7 +233,15 @@ function addDragEvents(card) {
     const draggedFile = selectedFiles.splice(draggedIndex, 1)[0];
     selectedFiles.splice(targetIndex, 0, draggedFile);
 
+    draggedIndex = null;
     renderPdfList();
+  });
+
+  card.addEventListener("dragend", () => {
+    card.classList.remove("dragging");
+    card.style.transform = "";
+    card.style.boxShadow = "";
+    draggedIndex = null;
   });
 }
 
@@ -197,8 +263,6 @@ mergeForm.addEventListener("submit", async (e) => {
   try {
     mergeBtn.disabled = true;
     mergeBtn.textContent = "Merging…";
-    mergePdfMobile.disabled = true;
-    mergePdfMobile.textContent = "Merging…";
 
     const response = await fetch("/pdf/merge", {
       method: "POST",
@@ -215,12 +279,7 @@ mergeForm.addEventListener("submit", async (e) => {
     
     // Show download button
     const downloadBtn = document.getElementById("downloadMergedBtn");
-    const downloadBtnMobile = document.getElementById("downloadMergedBtnMobile");
     if (downloadBtn) downloadBtn.classList.remove("hidden");
-    if (downloadBtnMobile) downloadBtnMobile.classList.remove("hidden");
-    
-    // Open in new tab
-    window.open(url, "_blank");
 
   } catch (error) {
     console.error("Error merging PDFs:", error);
@@ -228,15 +287,11 @@ mergeForm.addEventListener("submit", async (e) => {
   } finally {
     mergeBtn.disabled = selectedFiles.length < 2;
     mergeBtn.textContent = "Merge PDFs";
-    mergePdfMobile.disabled = selectedFiles.length < 2;
-    mergePdfMobile.textContent = "Merge PDFs";
   }
 });
 
-// ========== 10. MOBILE MERGE BUTTON ==========
-// Handle mobile mDOWNLOAD BUTTON HANDLERS ==========
+// ========== DOWNLOAD BUTTON HANDLERS ==========
 const downloadMergedBtn = document.getElementById("downloadMergedBtn");
-const downloadMergedBtnMobile = document.getElementById("downloadMergedBtnMobile");
 
 if (downloadMergedBtn) {
   downloadMergedBtn.addEventListener("click", () => {
@@ -245,20 +300,6 @@ if (downloadMergedBtn) {
     }
   });
 }
-
-if (downloadMergedBtnMobile) {
-  downloadMergedBtnMobile.addEventListener("click", () => {
-    if (mergedFileData) {
-      downloadFile(mergedFileData, "merged.pdf");
-    }
-  });
-}
-
-// ========== 12. erge button submit
-mergePdfMobile?.addEventListener("click", (e) => {
-  e.preventDefault();
-  mergeForm.dispatchEvent(new Event("submit"));
-});
 
 // ========== 11. CALL INITIAL SETUP ==========
 // Initialize UI on page load

@@ -18,8 +18,6 @@ const previewContainer = document.getElementById('previewContainer');
 const imgToPdfBtn = document.getElementById("imgToPdfBtn");
 const addImage = document.querySelectorAll(".add-image");
 const btnConvertPdf = document.querySelectorAll(".btn-convert-pdf");
-const convertToPdfMobile = document.getElementById("ConvertToPdfMobile");
-const buttonOnMobile = document.querySelector(".mobile-view-btn");
 
 // ========== 2. GLOBAL VARIABLES ==========
 // These store data used across the entire application
@@ -74,29 +72,24 @@ imgInput.addEventListener('change', (e) => {
 });
 
 // ========== 5. UPDATE UI VISIBILITY ==========
-// Show/hide different sections based on whether user has uploaded images
-
+// Show/hide// This function toggles elements based on whether we have images or not
 const updatePreviewContainer = () => {
+    // Hide download button when file configuration changes
+    const downloadBtn = document.getElementById("downloadImagePdfBtn");
+    if (downloadBtn) {
+        downloadBtn.classList.add("hidden");
+    }
+
     if (filesArray.length > 0) {
-        // User has images: Show preview and convert button
-        imgMainSection.classList.add("image-pdf-main-section");
-        uploadSection.classList.add("hidden");
-        toolSection.classList.remove("hidden");
+        uploadSection.classList.add('hidden');
+        previewContainer.classList.remove('hidden');
+        toolSection.classList.remove('hidden'); // Assuming toolSection should be shown
         imgToPdfBtn.removeAttribute("disabled");
-        
-        // Mobile: Show mobile buttons
-        buttonOnMobile.classList.remove("hidden-on-mobile");
-        convertToPdfMobile.removeAttribute("disabled");
     } else {
-        // No images: Show upload area, hide convert button
-        imgMainSection.classList.remove("image-pdf-main-section");
-        uploadSection.classList.remove("hidden");
-        toolSection.classList.add("hidden");
+        uploadSection.classList.remove('hidden');
+        previewContainer.classList.add('hidden');
+        toolSection.classList.add('hidden'); // Assuming toolSection should be hidden
         imgToPdfBtn.setAttribute("disabled", true);
-        
-        // Mobile: Hide mobile buttons
-        buttonOnMobile?.classList.add("hidden-on-mobile");
-        convertToPdfMobile?.setAttribute("disabled", true);
     }
 };
 
@@ -173,6 +166,8 @@ dragZones.forEach(zone => {
 // ========== 7. CREATE IMAGE PREVIEW CARDS ==========
 // This is the main function that creates and displays all image cards
 
+let draggedIndex = null;
+
 const renderPreviews = () => {
     // Clear previous cards from the container
     previewContainer.innerHTML = '';
@@ -182,17 +177,23 @@ const renderPreviews = () => {
         // ===== Create the card's HTML structure =====
         const card = document.createElement('div');
         card.className = 'image-card';
+        card.draggable = true;
         card.dataset.index = index;  // Store which image this card represents
         
         // Create remove button (X)
         const removeBtn = document.createElement('button');
         removeBtn.className = 'image-remove-btn';
+        removeBtn.type = 'button';
         removeBtn.innerHTML = '<i class="fas fa-times"></i>';
-        removeBtn.onclick = () => removeFile(index);
+        removeBtn.onclick = (e) => {
+            e.preventDefault();
+            removeFile(index);
+        };
         
         // Create image container
         const imgWrapper = document.createElement('div');
         imgWrapper.className = 'img-wrapper';
+        imgWrapper.style.pointerEvents = 'none';
         
         // Read the file and convert it to display-able format (Base64)
         const reader = new FileReader();
@@ -208,12 +209,14 @@ const renderPreviews = () => {
         const fileName = document.createElement('div');
         fileName.className = 'file-name';
         fileName.textContent = file.name;
+        fileName.style.pointerEvents = 'none';
         
         // Assemble all parts into the card
         card.appendChild(removeBtn);
         card.appendChild(imgWrapper);
         card.appendChild(fileName);
         
+        addDragEvents(card);
         // Add the completed card to the page
         previewContainer.appendChild(card);
     });
@@ -221,6 +224,65 @@ const renderPreviews = () => {
     // Update UI showing convert button, etc.
     updatePreviewContainer();
 };
+
+// ========== 7.5 DRAG & DROP REORDERING ==========
+// Allow users to drag images to reorder them
+function addDragEvents(card) {
+  card.addEventListener("dragstart", (e) => {
+    draggedIndex = Number(card.dataset.index);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", draggedIndex.toString());
+    
+    // Defer visual change so drag image isn't affected
+    setTimeout(() => {
+        card.classList.add("dragging");
+    }, 0);
+  });
+
+  card.addEventListener("dragenter", (e) => {
+    e.preventDefault();
+    if (draggedIndex !== null && Number(card.dataset.index) !== draggedIndex) {
+        card.style.transform = "scale(1.02)";
+        card.style.boxShadow = "0 8px 16px rgba(0,0,0,0.1)";
+    }
+  });
+
+  card.addEventListener("dragleave", (e) => {
+    e.preventDefault();
+    card.style.transform = "";
+    card.style.boxShadow = "";
+  });
+
+  card.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  });
+
+  card.addEventListener("drop", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    card.style.transform = "";
+    card.style.boxShadow = "";
+
+    const targetIndex = Number(card.dataset.index);
+
+    if (draggedIndex === null || draggedIndex === targetIndex) return;
+
+    const draggedFile = filesArray.splice(draggedIndex, 1)[0];
+    filesArray.splice(targetIndex, 0, draggedFile);
+
+    draggedIndex = null;
+    renderPreviews();
+  });
+
+  card.addEventListener("dragend", () => {
+    card.classList.remove("dragging");
+    card.style.transform = "";
+    card.style.boxShadow = "";
+    draggedIndex = null;
+  });
+}
 
 // ========== 8. REMOVE IMAGE ==========
 // When user clicks the X button on a card, remove that image
@@ -265,12 +327,7 @@ btnConvertPdf.forEach(btn => {
         
         // Show download buttons
         const downloadBtn = document.getElementById("downloadImagePdfBtn");
-        const downloadBtnMobile = document.getElementById("downloadImagePdfBtnMobile");
         if (downloadBtn) downloadBtn.classList.remove("hidden");
-        if (downloadBtnMobile) downloadBtnMobile.classList.remove("hidden");
-        
-        // Open in new tab
-        window.open(url, "_blank");
        
        } catch (err) {
             console.log(err);
@@ -286,18 +343,9 @@ btnConvertPdf.forEach(btn => {
 
 // ========== DOWNLOAD BUTTON HANDLERS ==========
 const downloadImagePdfBtn = document.getElementById("downloadImagePdfBtn");
-const downloadImagePdfBtnMobile = document.getElementById("downloadImagePdfBtnMobile");
 
 if (downloadImagePdfBtn) {
   downloadImagePdfBtn.addEventListener("click", () => {
-    if (convertedFileData) {
-      downloadFile(convertedFileData, "images-to-pdf.pdf");
-    }
-  });
-}
-
-if (downloadImagePdfBtnMobile) {
-  downloadImagePdfBtnMobile.addEventListener("click", () => {
     if (convertedFileData) {
       downloadFile(convertedFileData, "images-to-pdf.pdf");
     }

@@ -56,6 +56,14 @@ function fixLinks(container, root) {
         link.href = root ? `${root}/pages/pdf-to-image.html` : "pages/pdf-to-image.html";
         break;
 
+      case "add-page-number":
+        link.href = root ? `${root}/pages/add-page-number.html` : "pages/add-page-number.html";
+        break;
+
+      case "compress":
+        link.href = root ? `${root}/pages/compress-pdf.html` : "pages/compress-pdf.html";
+        break;
+
       case "login":
         link.href = root ? `${root}/pages/auth/login.html` : "pages/auth/login.html";
         break;
