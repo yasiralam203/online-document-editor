@@ -23,6 +23,9 @@ function loadComponent(id, componentPath) {
     .then(html => {
       container.innerHTML = html;
       fixLinks(container, root);
+      if (id === "header") {
+        highlightActiveNav();
+      }
     })
     .catch(error => {
       console.error(error);
@@ -84,3 +87,18 @@ document.addEventListener("click", (e) => {
     }
   }
 });
+
+function highlightActiveNav() {
+  const path = window.location.pathname;
+  const filename = path.split("/").pop();
+  if (!filename || filename === "index.html") return;
+
+  const navLinks = document.querySelectorAll(".nav-tools a");
+  navLinks.forEach(link => {
+    const href = link.getAttribute("href");
+    if (href && href.includes(filename)) {
+      link.classList.add("active");
+    }
+  });
+}
+
