@@ -6,7 +6,8 @@ import { requestIdMiddleware } from "./middlewares/requestId.js";
 import { startAutoCleanup } from "./utils/cleanup.js";
 
 const app = express();
-const port = 3000;
+// const port = 3000;
+const port = process.env.PORT || 3000;
 
 /* 🔹 ES module dirname fix */
 const __filename = fileURLToPath(import.meta.url);
@@ -27,9 +28,9 @@ app.use(express.static(path.join(__dirname, "..", "frontend")));
 // connect PDF routes API routes
 app.use("/pdf", pdfRoutes);
 
-app.get("/", (req, res) => {
-    res.send("Hello from ES6 backend 🚀");
-});
+// app.get("/", (req, res) => {
+//     res.send("Hello from ES6 backend 🚀");
+// });
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
