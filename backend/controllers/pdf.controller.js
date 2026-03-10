@@ -6,9 +6,35 @@ import { execFile } from "child_process";
 import util from "util";
 
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import pdfPoppler from "pdf-poppler";//for pdf to image
 
 const execFilePromise = util.promisify(execFile);
+
+// Helper function to resolve Ghostscript command dynamically
+const getGhostscriptCmd = () => {
+    let gsCmd = process.platform === "win32" ? "gswin64c" : "gs";
+    if (process.platform === "win32") {
+        try {
+            const gsPaths = [
+                "gswin64c", 
+                "C:\\Program Files\\gs\\gs10.06.0\\bin\\gswin64c.exe",
+                "C:\\Program Files\\gs\\gs10.04.0\\bin\\gswin64c.exe",
+                "C:\\Program Files\\gs\\gs10.03.1\\bin\\gswin64c.exe",
+                "C:\\Program Files\\gs\\gs10.02.1\\bin\\gswin64c.exe",
+                "C:\\Program Files\\gs\\gs10.01.1\\bin\\gswin64c.exe"
+            ];
+            for (const p of gsPaths) {
+                if (p === "gswin64c") continue;
+                if (fs.existsSync(p)) {
+                    gsCmd = p;
+                    break;
+                }
+            }
+        } catch (err) {
+            console.error("Ghostscript path resolution error", err);
+        }
+    }
+    return gsCmd;
+};
 
 /*
 ====================================================
@@ -275,13 +301,26 @@ export const pdfToImage = async (req, res) => {
         const mergedPdfPath = path.join(mergedDir, "merged.pdf");
         fs.writeFileSync(mergedPdfPath, mergedPdfBytes);
 
-        // ================= PDF → IMAGE =================
-        await pdfPoppler.convert(mergedPdfPath, {
-            format: "png",
-            out_dir: imageDir,
-            out_prefix: "page",
-            page: null // null = convert all pages
-        });
+        // ================= PDF → IMAGE (USING GHOSTSCRIPT) =================
+        const gsCmd = getGhostscriptCmd();
+        const outputPattern = path.join(imageDir, "page-%d.png");
+        
+        const gsArgs = [
+            "-dSAFER",
+            "-dBATCH",
+            "-dNOPAUSE",
+            "-sDEVICE=png16m",
+            "-r300",
+            `-sOutputFile=${outputPattern}`,
+            mergedPdfPath
+        ];
+
+        try {
+            await execFilePromise(gsCmd, gsArgs);
+        } catch (gsError) {
+            console.error("Ghostscript conversion error:", gsError);
+            throw new Error("PDF to Image conversion failed using Ghostscript");
+        }
 
         // ================= ZIP IMAGES =================
         const zipPath = path.join(baseDir, "images.zip");
@@ -375,33 +414,8 @@ export const compressPdf = async (req, res) => {
         fs.renameSync(file.path, inputPath);
 
         // Determine ghostscript command name (gswin64c on Windows, gs on Linux/Mac)
-        let gsCmd = process.platform === "win32" ? "gswin64c" : "gs";
-        
-        // Dynamically resolve Ghostscript on Windows if it's not in PATH
-        if (process.platform === "win32") {
-            try {
-                // If it fails to run 'gswin64c -v', we know it's not in the PATH.
-                // It throws an ENOENT error if it's missing.
-                const gsPaths = [
-                    "gswin64c", 
-                    "C:\\Program Files\\gs\\gs10.06.0\\bin\\gswin64c.exe",
-                    "C:\\Program Files\\gs\\gs10.04.0\\bin\\gswin64c.exe",
-                    "C:\\Program Files\\gs\\gs10.03.1\\bin\\gswin64c.exe",
-                    "C:\\Program Files\\gs\\gs10.02.1\\bin\\gswin64c.exe"
-                ];
-
-                for (const p of gsPaths) {
-                    if (p === "gswin64c") continue; // We'll try the others instead
-                    if (fs.existsSync(p)) {
-                        gsCmd = p;
-                        console.log("Found Ghostscript at:", gsCmd);
-                        break;
-                    }
-                }
-            } catch (err) {
-                console.error("Path resolution error", err);
-            }
-        }
+        let gsCmd = getGhostscriptCmd();
+        console.log("Found Ghostscript at:", gsCmd);
         
         const gsArgs = [
             "-sDEVICE=pdfwrite",
