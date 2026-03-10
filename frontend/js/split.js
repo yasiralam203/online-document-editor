@@ -155,7 +155,7 @@ const removePdf = () => {
     formData.append("end", endPage.value);
 
     try {
-      const response = await fetch("/pdf/split", {
+      const response = await fetch(`${API_URL}/pdf/split`, {
         method: "POST",
         body: formData
       });

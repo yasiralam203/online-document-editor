@@ -137,7 +137,7 @@ const removePdf = () => {
     formData.append("position", positionSelect.value);
 
     try {
-      const response = await fetch("/pdf/add-page-number", {
+      const response = await fetch(`${API_URL}/pdf/add-page-number`, {
         method: "POST",
         body: formData
       });

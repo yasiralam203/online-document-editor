@@ -68,8 +68,9 @@ This app is production-ready for services like **Render**, **Railway**, or **Her
 - **Build Command**: `cd backend && npm install`
 - **Start Command**: `cd backend && npm start`
 - **Environment Variables**: The app leverages `PORT` (defaults to 3000).
+- **Frontend API URL**: The frontend automatically connects to the correct backend URL using `frontend/js/config.js`. It defaults to `http://localhost:3000` for local development, and uses your production URL (`https://online-document-editor.onrender.com`) when deployed. To change the production URL, simply update the `API_URL` variable in `frontend/js/config.js`.
 
 ## 📁 Project Structure
 - `/frontend`: All HTML, CSS, and client-side JavaScript. Served automatically by the Node.js backend as static assets.
 - `/backend`: Node.js Express server, API routes, and PDF processing controllers.
-- `/backend/temp`: Temporary directory for processing uploads and downloads (auto-cleaned).
+- `/backend/temp`: Temporary directory for processing uploads and downloads (auto-overwritten/cleaned).

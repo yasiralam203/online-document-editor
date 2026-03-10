@@ -113,7 +113,7 @@ compressForm.addEventListener("submit", async (e) => {
         compressBtn.disabled = true;
         compressBtn.textContent = "Compressing…";
 
-        const response = await fetch("/pdf/compress", {
+        const response = await fetch(`${API_URL}/pdf/compress`, {
             method: "POST",
             body: formData
         });

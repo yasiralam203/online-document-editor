@@ -313,7 +313,7 @@ btnConvertPdf.forEach(btn => {
         btn.disabled = true;
         btn.textContent = "Converting…";
         
-        const response = await fetch("/pdf/image-to-pdf", {
+        const response = await fetch(`${API_URL}/pdf/image-to-pdf`, {
             method: "POST",
             body: formData
         });

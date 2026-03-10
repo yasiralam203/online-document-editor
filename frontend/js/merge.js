@@ -264,7 +264,7 @@ mergeForm.addEventListener("submit", async (e) => {
     mergeBtn.disabled = true;
     mergeBtn.textContent = "Merging…";
 
-    const response = await fetch("/pdf/merge", {
+    const response = await fetch(`${API_URL}/pdf/merge`, {
       method: "POST",
       body: formData
     });

@@ -275,7 +275,7 @@ btnConvertImage.forEach(btn => {
         // btn.textContent = "Converting…";
         btn.classList.add("btn-loading");
 
-        const response = await fetch("/pdf/pdf-to-image", {
+        const response = await fetch(`${API_URL}/pdf/pdf-to-image`, {
             method: "POST",
             body: formData
         });
