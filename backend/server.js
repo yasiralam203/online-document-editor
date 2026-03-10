@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import pdfRoutes from "./routes/pdf.routes.js";
@@ -6,6 +7,15 @@ import { requestIdMiddleware } from "./middlewares/requestId.js";
 import { startAutoCleanup } from "./utils/cleanup.js";
 
 const app = express();
+
+
+/* 🔹 CORS Configuration */
+app.use(cors({
+    origin: ["https://online-document-editor.vercel.app", "http://localhost:5173"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
 // const port = 3000;
 const port = process.env.PORT || 3000;
 
