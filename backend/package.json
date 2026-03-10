@@ -1,5 +1,5 @@
 {
-  "name": "backend",
+  "name": "online-document-editor-backend",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",

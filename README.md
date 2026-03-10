@@ -1,4 +1,4 @@
-# Doc Editor - PDF Tools Web App
+# Online Document Editor - PDF Tools Web App
 
 A modern, fast, and secure web application for managing PDF files. Built with Node.js/Express on the backend and Vanilla JS/HTML/CSS on the frontend, featuring a responsive, mobile-friendly design.
 
