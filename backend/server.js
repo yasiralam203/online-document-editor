@@ -31,12 +31,14 @@ app.use(requestIdMiddleware);
 // Start auto cleanup (runs exactly every 10 min, cleans files older than 1 hr)
 startAutoCleanup(10 * 60 * 1000, 60 * 60 * 1000);
 
+// connect PDF routes API routes
+app.use("/pdf", pdfRoutes);
+
+
 /* ✅ SERVE FRONTEND CORRECTLY */
 app.use(express.static(path.join(__dirname, "..", "frontend")));
 
 
-// connect PDF routes API routes
-app.use("/pdf", pdfRoutes);
 
 // app.get("/", (req, res) => {
 //     res.send("Hello from ES6 backend 🚀");
