@@ -35,16 +35,40 @@ let splitFileData = null;
 
 // ========== 2.5. DOWNLOAD HELPER FUNCTION ==========
 
-const downloadFile = (blob, filename) => {
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.style.display = "none";
-  document.body.appendChild(a);
-  a.click();
-  window.URL.revokeObjectURL(url);
-  a.remove();
+const downloadFile = async (blob, filename) => {
+  const isCapacitor = typeof window.Capacitor !== 'undefined' && window.Capacitor.isNativePlatform();
+
+  if (isCapacitor) {
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = async () => {
+      const base64data = reader.result.split(',')[1];
+
+      try {
+        const Filesystem = window.Capacitor.Plugins.Filesystem;
+
+        await Filesystem.writeFile({
+          path: filename,
+          data: base64data,
+          directory: 'DOCUMENTS'
+        });
+
+        alert(`Successfully saved ${filename} to your Documents folder!`);
+      } catch (err) {
+        alert("Failed to save file natively: " + err.message);
+      }
+    };
+  } else {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
+  }
 };
 
 // ========== 3. UPLOAD AREA SETUP ==========
