@@ -27,18 +27,60 @@ let mergedFileData = null;
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+// // ========== 2.5. DOWNLOAD HELPER FUNCTION ==========
+// const downloadFile = (blob, filename) => {
+//   const url = window.URL.createObjectURL(blob);
+//   const a = document.createElement('a');
+//   a.href = url;
+//   a.download = filename;
+//   a.style.display = 'none';
+//   document.body.appendChild(a);
+//   a.click();
+//   window.URL.revokeObjectURL(url);
+//   a.remove();
+// };
+
 // ========== 2.5. DOWNLOAD HELPER FUNCTION ==========
-const downloadFile = (blob, filename) => {
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.style.display = 'none';
-  document.body.appendChild(a);
-  a.click();
-  window.URL.revokeObjectURL(url);
-  a.remove();
+const downloadFile = async (blob, filename) => {
+  // Check if we are running inside the native Android App via Capacitor
+  const isCapacitor = typeof capacitorExports !== 'undefined' && capacitorExports.Filesystem;
+
+  if (isCapacitor) {
+    // 1. Convert Blob to Base64
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = async () => {
+      const base64data = reader.result; 
+
+      try {
+        const { Filesystem, Directory } = capacitorExports;
+        
+        // 2. Write file natively to the user's Documents folder
+        await Filesystem.writeFile({
+          path: filename,
+          data: base64data,
+          directory: Directory.Documents
+        });
+        
+        alert(`Successfully saved ${filename} to your Documents folder!`);
+      } catch (err) {
+        alert("Failed to save file: " + err.message);
+      }
+    };
+  } else {
+    // Fallback for regular web browsers
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
+  }
 };
+
 
 // ========== 3. UPLOAD BUTTON SETUP ==========
 // Allow users to click "Add PDFs" buttons to select files
