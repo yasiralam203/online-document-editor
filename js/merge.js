@@ -42,29 +42,30 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs
 
 // ========== 2.5. DOWNLOAD HELPER FUNCTION ==========
 const downloadFile = async (blob, filename) => {
-  // Check if we are running inside the native Android App via Capacitor
-  const isCapacitor = typeof capacitorExports !== 'undefined' && capacitorExports.Filesystem;
+  // Check if we are running natively inside Capacitor
+  const isCapacitor = typeof window.Capacitor !== 'undefined' && window.Capacitor.isNativePlatform();
 
   if (isCapacitor) {
     // 1. Convert Blob to Base64
     const reader = new FileReader();
     reader.readAsDataURL(blob);
     reader.onloadend = async () => {
-      const base64data = reader.result; 
+      // 2. IMPORTANT: Android expects raw base64, so we must remove the "data:application/pdf;base64," prefix
+      const base64data = reader.result.split(',')[1]; 
 
       try {
-        const { Filesystem, Directory } = capacitorExports;
+        const Filesystem = window.Capacitor.Plugins.Filesystem;
         
-        // 2. Write file natively to the user's Documents folder
+        // 3. Write file natively to the user's Documents folder
         await Filesystem.writeFile({
           path: filename,
           data: base64data,
-          directory: Directory.Documents
+          directory: 'DOCUMENTS' // Use string 'DOCUMENTS' instead of the JS enum
         });
         
         alert(`Successfully saved ${filename} to your Documents folder!`);
       } catch (err) {
-        alert("Failed to save file: " + err.message);
+        alert("Failed to save file natively: " + err.message);
       }
     };
   } else {
