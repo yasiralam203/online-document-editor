@@ -10,8 +10,20 @@ const app = express();
 
 
 /* 🔹 CORS Configuration */
+// app.use(cors({
+//     origin: ["https://online-document-editor.vercel.app", "http://localhost:5173"],
+//     methods: ["GET", "POST", "PUT", "DELETE"],
+//     allowedHeaders: ["Content-Type", "Authorization"]
+// }));
+
+/* 🔹 CORS Configuration */
 app.use(cors({
-    origin: ["https://online-document-editor.vercel.app", "http://localhost:5173"],
+    origin: [
+        "https://online-document-editor.vercel.app", 
+        "http://localhost:5173",
+        "https://localhost",   // Required for Capacitor on Android
+        "capacitor://localhost" // Required if you ever build for iOS
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
