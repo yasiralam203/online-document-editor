@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Split PDF</title>
+
+  <!-- Global CSS -->
+  <link rel="stylesheet" href="../css/main.css?v=2" />
+  <link rel="stylesheet" href="../css/tool-layout.css?v=2" />
+  <link rel="stylesheet" href="../css/split.css?v=2" />
+</head>
+
+<body data-root="..">
+
+  <!-- Header -->
+  <div id="header"></div>
+
+  <!-- ===== Split PDF Tool Wrapper ===== -->
+  <main class="tool-workspace-layout split-pdf">
+
+    <!-- ===== Upload Section ===== -->
+    <div class="upload-section">
+      <h1>Split PDF</h1>
+      <p>Select a PDF file and extract a page range</p>
+
+      <div class="pdfInputBtn add-pdf">
+        <span>Choose PDF</span>
+        <input type="file" id="pdfInput" class="pdfInput" accept="application/pdf" />
+      </div>
+    </div>
+
+    <!-- ===== Preview Area ===== -->
+    <div id="previewContainer" class="iframe-preview hidden">
+      <!-- PDF preview / thumbnails handled by JS -->
+    </div>
+
+    <!-- ===== Tool Page (Right Panel) ===== -->
+    <main class="tool-page hidden">
+      <form class="tool-form" id="splitForm">
+
+        <h1>Split PDF</h1>
+        <p>Choose page range to extract</p>
+
+        <!-- Start Page -->
+        <div class="tool-options">
+          <label for="startPage">Start Page</label>
+          <input id="startPage" type="text" inputmode="numeric" pattern="[0-9]+" placeholder="e.g. 1"
+            oninput="this.value = this.value.replace(/[^0-9]/g, '')" autocomplete="off" />
+        </div>
+
+        <!-- End Page -->
+        <div class="tool-options">
+          <label for="endPage">End Page</label>
+          <input id="endPage" type="text" inputmode="numeric" pattern="[0-9]+" placeholder="e.g. 1"
+            oninput="this.value = this.value.replace(/[^0-9]/g, '')" autocomplete="off" />
+        </div>
+
+        <!-- Buttons -->
+        <div class="tool-form-btn">
+          <button type="button" class="tool-btn secondary add-pdf" id="addPdfBtn">
+            + Change PDF
+          </button>
+
+          <button type="button" class="tool-btn primary" id="splitBtn" disabled>
+            Split PDF
+          </button>
+
+          <button type="button" class="tool-btn success download-btn hidden" id="downloadSplitBtn">
+            ⬇ Download
+          </button>
+        </div>
+
+      </form>
+    </main>
+
+
+  </main>
+
+
+  <!-- Scripts -->
+  <script src="../js/config.js"></script>
+  <script src="../js/include.js"></script>
+  <script src="../js/split.js"></script>
+
+</body>
+
+</html>
